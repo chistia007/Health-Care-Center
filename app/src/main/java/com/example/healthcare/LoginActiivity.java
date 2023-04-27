@@ -10,38 +10,38 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.example.healthcare.databinding.ActivityLoginActiivityBinding;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class LoginActiivity extends AppCompatActivity {
     ActivityLoginActiivityBinding binding;
-    Database db;
+    private FirebaseAuth mAuth;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding=ActivityLoginActiivityBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        db=new Database(this);
+
+        mAuth= FirebaseAuth.getInstance();
 
         binding.btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String username=binding.edtUsername.getText().toString();
+                String email=binding.edtEmail.getText().toString();
                 String password=binding.edtPassword.getText().toString();
-                if (username.length()==0 || password.length()==0){
-                    Toast.makeText(LoginActiivity.this, "Empty field!", Toast.LENGTH_SHORT).show();
+                if (email.length()==0 || password.length()==0){
+                    Toast.makeText(LoginActiivity.this, "Empty Credentials!", Toast.LENGTH_SHORT).show();
                 }
                 else{
-                    if (db.login(username,password)=="1"){
-                        Toast.makeText(LoginActiivity.this, "Login Success", Toast.LENGTH_SHORT).show();
-                        SharedPreferences sharedPreferences=getSharedPreferences("shared_prefs", Context.MODE_PRIVATE);
-                        SharedPreferences.Editor editor=sharedPreferences.edit();
-                        editor.putString("username",username);
-                        // to save our data with key and value
-                        editor.apply();
-                        startActivity(new Intent(LoginActiivity.this, HomeActivity.class));
-                    }
-                    else{
-                        Toast.makeText(LoginActiivity.this, "User does not exist", Toast.LENGTH_SHORT).show();
-                    }
+                    mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
+                        if(task.isSuccessful()){
+                            Toast.makeText(LoginActiivity.this, "Welcome back!", Toast.LENGTH_SHORT).show();
+                            Intent intent=new Intent(LoginActiivity.this,HomeActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            startActivity(intent);
+                            finish();
+                        }
+                    }).addOnFailureListener(e -> Toast.makeText(LoginActiivity.this, e.getMessage(), Toast.LENGTH_SHORT).show());
+
 
                 }
 
@@ -54,5 +54,10 @@ public class LoginActiivity extends AppCompatActivity {
                 startActivity(new Intent(LoginActiivity.this, RegisterActivity.class));
             }
         });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
     }
 }

@@ -8,15 +8,25 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.example.healthcare.databinding.ActivityRegisterBinding;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 public class RegisterActivity extends AppCompatActivity {
     ActivityRegisterBinding binding;
-    Database db;
+    private FirebaseAuth mAuth;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding=ActivityRegisterBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        mAuth= FirebaseAuth.getInstance();
 
         binding.txtAlreadyUser.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -33,19 +43,36 @@ public class RegisterActivity extends AppCompatActivity {
                 String password=binding.edtPassword.getText().toString();
                 String confirmPassword=binding.edtComfirmPassword.getText().toString();
 
-                db=new Database(RegisterActivity.this);
 
                 if (username.length()==0 || email.length()==0 || password.length()==0 || confirmPassword.length()==0){
-                    Toast.makeText(RegisterActivity.this, "Empty field!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RegisterActivity.this, "Empty Credentials!", Toast.LENGTH_SHORT).show();
                 }
                 else {
                     if (password.compareTo(confirmPassword) == 0) {
-                        db.register(username,email,password);
-                        Toast.makeText(RegisterActivity.this, "Register successful", Toast.LENGTH_SHORT).show();
+
+                        mAuth.createUserWithEmailAndPassword(email,password).addOnSuccessListener(authResult -> {
+                            Toast.makeText(RegisterActivity.this, "Registered Successfully", Toast.LENGTH_SHORT).show();
+                            FirebaseFirestore db = FirebaseFirestore.getInstance();
+                            Map<String,String> user=new HashMap<>();
+                            user.put("userName",binding.edtUsername.getText().toString());
+                            user.put("email",binding.edtEmail.getText().toString());
+                            user.put("password",binding.edtPassword.getText().toString());
+
+
+                            CollectionReference col = db.collection("Users");
+
+                            col.document(Objects.requireNonNull(mAuth.getCurrentUser()).getUid()).set(user).addOnSuccessListener(aVoid -> {
+
+                                    })
+                                    .addOnFailureListener(e -> Toast.makeText(RegisterActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show());
+                            //startActivity(new Intent(RegisterActivity.this,HomeActivity.class));
+
+                        }).addOnFailureListener(e -> {
+
+                            Toast.makeText(RegisterActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                        });
                     }
-                    else {
-                        Toast.makeText(RegisterActivity.this, "Password did not match", Toast.LENGTH_SHORT).show();
-                    }
+
                 }
             }
         });
