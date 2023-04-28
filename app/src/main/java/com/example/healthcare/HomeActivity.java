@@ -75,5 +75,27 @@ public class HomeActivity extends AppCompatActivity {
                 startActivity(new Intent(HomeActivity.this, OrderDetails.class) );
             }
         });
+
+        binding.cardBuyMedicine.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(HomeActivity.this,BuyMedicineActivity.class));
+            }
+        });
+
+
+        binding.cardLabTest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(HomeActivity.this,LabTestActivity.class));
+            }
+        });
+
+        binding.CardHealthArticles.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(HomeActivity.this,HealthArticleActivity.class));
+            }
+        });
     }
 }
