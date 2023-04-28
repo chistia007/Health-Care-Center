@@ -59,5 +59,9 @@ public class LoginActiivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        if(FirebaseAuth.getInstance().getCurrentUser()!=null){
+            startActivity(new Intent(LoginActiivity.this,HomeActivity.class));
+            finish();
+        }
     }
 }

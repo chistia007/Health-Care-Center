@@ -1,5 +1,6 @@
 package com.example.healthcare;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
@@ -13,58 +14,34 @@ import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 import com.example.healthcare.databinding.ActivityDcotorDetailsBinding;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 //1:56
 public class DoctorDetailsActivity extends AppCompatActivity {
     ActivityDcotorDetailsBinding binding;
     HashMap<String, String> items;
+    private String doctorName;
+    private String hospitalAddress ;
+    private String doctorFees;
+    private String appointmentTime ;
+    private FirebaseAuth mAuth;
+    private DocumentReference docRef;
+    private FirebaseFirestore db;
+    private  int documentCount;
 
-    private String [][] docotrDetails1={
-            {"Doctor name : Chisthia Khan","Hospital address : Dhaka 1207","Exp : 7 years", "Mobile Number : 017382682", "1200", "05-05-2023 15:30"},
-            {"Doctor name : Samsung Khan","Hospital address : Chittagong 1207","Exp : 8 years", "Mobile Number : 015782682", "1000","06-05-2023 15:30"},
-            {"Doctor name : Rajesh Khan","Hospital address : Dhaka 1207","Exp : 3 years", "Mobile Number : 018382682", "700","07-05-2023 15:30"},
-            {"Doctor name : Alex Khan","Hospital address : Dhaka 1207","Exp : 4 years", "Mobile Number : 013382682", "1200","06-05-2023 15:30"},
-            {"Doctor name : Nishita Khan","Hospital address : Chittagong 1207","Exp : 13 years", "Mobile Number : 016382682", "2000","06-05-2023 15:30"},
 
-    };
-    private String [][] docotrDetails2={
-            {"Doctor name : Chisthia Khan","Hospital address : Dhaka 1207","Exp : 7 years", "Mobile Number : 017382682", "1200","05-05-2023 15:30"},
-            {"Doctor name : Samsung Khan","Hospital address : Chittagong 1207","Exp : 8 years", "Mobile Number : 015782682", "1000","05-07-2023 15:30"},
-            {"Doctor name : Rajesh Khan","Hospital address : Dhaka 1207","Exp : 3 years", "Mobile Number : 018382682", "700","05-05-2023 15:30"},
-            {"Doctor name : Alex Khan","Hospital address : Dhaka 1207","Exp : 4 years", "Mobile Number : 013382682", "1200","05-05-2023 15:30"},
-            {"Doctor name : Nishita Khan","Hospital address : Chittagong 1207","Exp : 13 years", "Mobile Number : 016382682", "2000","05-05-2023 15:30"},
+    private List<List<String>> doctor_details;
+    ArrayList  list;
 
-    };
-    private String [][] docotrDetails3={
-            {"Doctor name : Chisthia Khan","Hospital address : Dhaka 1207","Exp : 7 years", "Mobile Number : 017382682", "1200","16-05-2023 15:30"},
-            {"Doctor name : Samsung Khan","Hospital address : Chittagong 1207","Exp : 8 years", "Mobile Number : 015782682", "1000","06-05-2023 15:30"},
-            {"Doctor name : Rajesh Khan","Hospital address : Dhaka 1207","Exp : 3 years", "Mobile Number : 018382682", "700","08-05-2023 15:30"},
-            {"Doctor name : Alex Khan","Hospital address : Dhaka 1207","Exp : 4 years", "Mobile Number : 013382682", "1200","07-05-2023 15:30"},
-            {"Doctor name : Nishita Khan","Hospital address : Chittagong 1207","Exp : 13 years", "Mobile Number : 016382682", "2000","09-05-2023 15:30"},
-
-    };
-    private String [][] docotrDetails4={
-            {"Doctor name : Chisthia Khan","Hospital address : Dhaka 1207","Exp : 7 years", "Mobile Number : 017382682", "1200","06-05-2023 15:30"},
-            {"Doctor name : Samsung Khan","Hospital address : Chittagong 1207","Exp : 8 years", "Mobile Number : 015782682", "1000","07-05-2023 15:30"},
-            {"Doctor name : Rajesh Khan","Hospital address : Dhaka 1207","Exp : 3 years", "Mobile Number : 018382682", "700","05-06-2023 15:30"},
-            {"Doctor name : Alex Khan","Hospital address : Dhaka 1207","Exp : 4 years", "Mobile Number : 013382682", "1200","05-05-2023 15:30"},
-            {"Doctor name : Nishita Khan","Hospital address : Chittagong 1207","Exp : 13 years", "Mobile Number : 016382682", "2000","05-05-2023 15:30"},
-
-    };
-    private String [][] docotrDetails5={
-            {"Doctor name : Chisthia Khan","Hospital address : Dhaka 1207","Exp : 7 years", "Mobile Number : 017382682", "1200","08-05-2023 15:30"},
-            {"Doctor name : Samsung Khan","Hospital address : Chittagong 1207","Exp : 8 years", "Mobile Number : 015782682", "1000","06-05-2023 15:30"},
-            {"Doctor name : Rajesh Khan","Hospital address : Dhaka 1207","Exp : 3 years", "Mobile Number : 018382682", "700","08-05-2023 15:30"},
-            {"Doctor name : Alex Khan","Hospital address : Dhaka 1207","Exp : 4 years", "Mobile Number : 013382682", "1200","4-05-2023 15:30"},
-            {"Doctor name : Nishita Khan","Hospital address : Chittagong 1207","Exp : 13 years", "Mobile Number : 016382682", "2000","24-05-2023 15:30"},
-
-    };
-    String[][] doctor_details={};
-    ArrayList list;
     SimpleAdapter sa;
     @SuppressLint("SuspiciousIndentation")
     @Override
@@ -77,64 +54,82 @@ public class DoctorDetailsActivity extends AppCompatActivity {
         String title= intent.getStringExtra("title");
         binding.doctorName.setText(title);
 
-        if (title.compareTo("Family Physicians")==0){
-            doctor_details=docotrDetails1;
-        }
-        else
-        if (title.compareTo("Dietitian")==0){
-            doctor_details=docotrDetails2;
-        }
-        else
-        if (title.compareTo("Dentist")==0){
-            doctor_details=docotrDetails3;
-        }
-        else
-        if (title.compareTo("Surgeon")==0){
-            doctor_details=docotrDetails4;
-        }
-        else doctor_details=docotrDetails5;
+        db = FirebaseFirestore.getInstance();
+        mAuth = FirebaseAuth.getInstance();
+        doctor_details = new ArrayList<List<String>>();
 
+        //number of document under collection of firestore
+        CollectionReference usersCollectionRef = db.collection(title);
+        usersCollectionRef.get().addOnSuccessListener(querySnapshot -> {
+            documentCount = querySnapshot.size();
 
+            for(int i=0;i<documentCount;i++){
+                final int index = i; // create a final variable to hold the current value of i
+                docRef = db.collection(title).document("doctor"+(i+1));
+                docRef.get().addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()){
+                        doctor_details.add(Arrays.asList(documentSnapshot.getString("doctor_name"),documentSnapshot.getString("hospital_address"),documentSnapshot.getString("Experience"),documentSnapshot.getString("mobile_number"),documentSnapshot.getString("fees"),documentSnapshot.getString("time")));
 
-//            binding.btnBack.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                startActivity(new Intent(DoctorDetailsActivity.this,FindDcotorActivity.class));
-//            }
-//        });
+                        list = new ArrayList();
+                        for (int j = 0; j < doctor_details.size(); j++) {
+                            HashMap<String, String> items = new HashMap<String, String>();
+                            items.put("line1", "Doctor name : "+doctor_details.get(j).get(0));
+                            items.put("line2", "Hospital Address : "+doctor_details.get(j).get(1));
+                            items.put("line3", "Experience : "+doctor_details.get(j).get(2));
+                            items.put("line4", "Phone : "+doctor_details.get(j).get(3));
+                            items.put("line5", "Consultant fees : " + doctor_details.get(j).get(4) + " TK");
+                            items.put("line6", "Appointment date : " + doctor_details.get(j).get(5));
+                            list.add(items);
+                        }
 
-        list = new ArrayList();
-        for (int i = 0; i < doctor_details.length; i++) {
-            HashMap<String, String> items = new HashMap<String, String>();
-            items.put("line1", doctor_details[i][0]);
-            items.put("line2", doctor_details[i][1]);
-            items.put("line3", doctor_details[i][2]);
-            items.put("line4", doctor_details[i][3]);
-            items.put("line5", "Consultant fees : " + doctor_details[i][4] + " TK");
-            items.put("line6", "Appointment date : " + doctor_details[i][5]);
-            list.add(items);
-        }
+                        sa = new SimpleAdapter(this, list, R.layout.doctor_list,
+                                new String[]{"line1", "line2", "line3", "line4", "line5","line6"},
+                                new int[]{R.id.dctName, R.id.hptlAddress, R.id.exp, R.id.phoneNumber, R.id.doctFees,R.id.time});
 
-        sa = new SimpleAdapter(this, list, R.layout.doctor_list,
-                new String[]{"line1", "line2", "line3", "line4", "line5","line6"},
-                new int[]{R.id.dctName, R.id.hptlAddress, R.id.exp, R.id.phoneNumber, R.id.doctFees,R.id.time});
-
-        binding.txtDoctorList.setAdapter(sa);
+                        binding.txtDoctorList.setAdapter(sa);
+                    }
+                });
+            }
+        }).addOnFailureListener(e -> {
+            Toast.makeText(DoctorDetailsActivity.this, "Failed to fetch data", Toast.LENGTH_SHORT).show();
+        });
 
 
         binding.txtDoctorList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 HashMap<String, String> selectedItem = (HashMap<String, String>) parent.getItemAtPosition(position);
-                String dctName = selectedItem.get("line1");
-                String hptlAddress = selectedItem.get("line2");
+                doctorName = selectedItem.get("line1");
+                hospitalAddress = selectedItem.get("line2");
                 String exp = selectedItem.get("line3");
                 String phoneNumber = selectedItem.get("line4");
-                String doctFees = selectedItem.get("line5");
-                String time = selectedItem.get("line6");
-                Toast.makeText(DoctorDetailsActivity.this, hptlAddress+" "+time, Toast.LENGTH_SHORT).show();
+                doctorFees = selectedItem.get("line5");
+                appointmentTime = selectedItem.get("line6");
+
+                AlertDialog.Builder builder=new AlertDialog.Builder(DoctorDetailsActivity.this);
+                builder.setTitle("Make Appointment");
+                builder.setMessage(doctorName +  "\n"+
+                        hospitalAddress +"\n"+
+                        doctorFees+"\n"+
+                        appointmentTime);
+                builder.setNegativeButton("Cancel", (dialog, which) -> {
+
+                });
+
+                builder.setPositiveButton("Proceed to Payment", (dialog, which) -> {
+                    Intent intent1=new Intent(DoctorDetailsActivity.this, PaymentGateway.class);
+                    intent1.putExtra("doctorName",doctorName);
+                    intent1.putExtra("appointmentTime",appointmentTime);
+                    startActivity(intent1);
+
+                });
+                builder.create().show();
+
             }
         });
+
+
+
 
 
 

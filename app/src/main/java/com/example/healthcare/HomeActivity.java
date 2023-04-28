@@ -10,26 +10,55 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.example.healthcare.databinding.ActivityHomeBinding;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.Objects;
 
 public class HomeActivity extends AppCompatActivity {
     ActivityHomeBinding binding;
+    private FirebaseAuth mAuth;
+    private DocumentReference docRef;
+    private FirebaseFirestore db;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding=ActivityHomeBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        SharedPreferences sharedPreferences=getSharedPreferences("shared_prefs", Context.MODE_PRIVATE);
-        String username= sharedPreferences.getString("username","").toString();
-        Toast.makeText(getApplicationContext(), "Welcome "+ username, Toast.LENGTH_SHORT).show();
+
+        db = FirebaseFirestore.getInstance();
+        mAuth = FirebaseAuth.getInstance();
+
+        //Welcome text
+
+        docRef = db.collection("Users").document(Objects.requireNonNull(mAuth.getCurrentUser()).getUid());
+
+        docRef.get().addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()){
+                        Toast.makeText(this, "welcome " + documentSnapshot.getString("userName"), Toast.LENGTH_SHORT).show();
+                    }
+
+                    else{
+                        Toast.makeText(HomeActivity.this, "Row not found", Toast.LENGTH_SHORT).show();
+                    }
+
+                })
+                    .addOnFailureListener(e -> Toast.makeText(HomeActivity.this, "Failed to fetch data", Toast.LENGTH_SHORT).show());
+
+
+
+
+
 
         binding.cardLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SharedPreferences.Editor editor=sharedPreferences.edit();
-                editor.clear();
-                editor.apply();
+                FirebaseAuth.getInstance().signOut();
                 startActivity(new Intent(HomeActivity.this,LoginActiivity.class));
+
             }
         });
 
@@ -37,6 +66,13 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(HomeActivity.this, FindDcotorActivity.class));
+            }
+        });
+
+        binding.cardOrderDetails.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(HomeActivity.this, OrderDetails.class) );
             }
         });
     }
