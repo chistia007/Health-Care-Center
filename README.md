@@ -2,4 +2,4 @@ This project has an admin side app as well as a report which consists of system 
 
 Admin side app --> [click here](https://github.com/chistia007/Health-Care-Center-Admin-Only)
 
-report ----------> [click here](https://drive.google.com/file/d/1c-Ib265O2qqCj8bKVTJPL7Zkw8dOYopj/view?usp=sharing)
+Report ----------> [click here](https://drive.google.com/file/d/1c-Ib265O2qqCj8bKVTJPL7Zkw8dOYopj/view?usp=sharing)
