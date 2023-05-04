@@ -6,6 +6,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
@@ -41,11 +42,6 @@ public class BuyMedicineActivity extends AppCompatActivity {
         binding.animatedText.startAnimation(animation);
 
 
-        //prescription upload
-
-        Toast.makeText(this, "Your Prescription Must Have phone number written on it", Toast.LENGTH_SHORT).show();
-
-
         FirebaseStorage storage= FirebaseStorage.getInstance("gs://health-care-center-e51e6.appspot.com");
         StorageReference storageRef = storage.getReference();
 
@@ -75,7 +71,9 @@ public class BuyMedicineActivity extends AppCompatActivity {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                             p.dismiss();
+                            startActivity(new Intent(BuyMedicineActivity.this,HomeActivity.class));
                             Toast.makeText(BuyMedicineActivity.this, "Received and we will contact soon", Toast.LENGTH_LONG).show();
+
                         }
                     });
                 }

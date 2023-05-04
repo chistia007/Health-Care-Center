@@ -52,6 +52,8 @@ public class RegisterActivity extends AppCompatActivity {
 
                         mAuth.createUserWithEmailAndPassword(email,password).addOnSuccessListener(authResult -> {
                             Toast.makeText(RegisterActivity.this, "Registered Successfully", Toast.LENGTH_SHORT).show();
+                            startActivity(new Intent(RegisterActivity.this,HomeActivity.class));
+                            //saving user data
                             FirebaseFirestore db = FirebaseFirestore.getInstance();
                             Map<String,String> user=new HashMap<>();
                             user.put("userName",binding.edtUsername.getText().toString());

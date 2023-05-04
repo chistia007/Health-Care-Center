@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -26,6 +27,9 @@ public class PaymentGateway extends AppCompatActivity {
 
     private FirebaseFirestore db;
     int documentCount;
+    String collectionTitle;
+    String doctorId;
+    String appointmentTaken;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,6 +70,7 @@ public class PaymentGateway extends AppCompatActivity {
 
                         col.document(Objects.requireNonNull(mAuth.getCurrentUser()).getUid()+"order"+(documentCount+1)).set(orders).addOnSuccessListener(aVoid -> {
                                     Toast.makeText(PaymentGateway.this, "Payment successful", Toast.LENGTH_SHORT).show();
+                                    appointmentIncrease();
                                     startActivity(new Intent(PaymentGateway.this, OrderDetails.class));
                                 })
                                 .addOnFailureListener(e -> Toast.makeText(PaymentGateway.this, e.getMessage(), Toast.LENGTH_SHORT).show());
@@ -80,5 +85,37 @@ public class PaymentGateway extends AppCompatActivity {
             };
 
         });
+
+
+
+
+
     }
+
+
+    //appointment numbers update
+    public void appointmentIncrease(){
+
+
+        Intent intent2=getIntent();
+        appointmentTaken=intent2.getStringExtra("appointmentTaken");
+        doctorId=intent2.getStringExtra("doctorId");
+        collectionTitle=intent2.getStringExtra("collectionTitle");
+        Log.d("aaaaa", "onCreate: " + collectionTitle+ doctorId);
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference docRef = db.collection(collectionTitle).document(doctorId);
+        int newAppointmentLimit0 = (Integer.parseInt(appointmentTaken) + 1);
+        String newAppointmentLimit = Integer.toString(newAppointmentLimit0);
+        Log.d("aaaaa", "onCreate: " + collectionTitle+ doctorId +newAppointmentLimit);
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("taken_appointment",  newAppointmentLimit);
+
+        docRef.update(updates).addOnSuccessListener(aVoid -> {
+            Toast.makeText(this, "suceesss", Toast.LENGTH_LONG).show();
+        }).addOnFailureListener(e -> {
+            // Handle failure
+        });
+
+    }
+
 }

@@ -53,14 +53,7 @@ public class HomeActivity extends AppCompatActivity {
 
 
 
-        binding.cardLogout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FirebaseAuth.getInstance().signOut();
-                startActivity(new Intent(HomeActivity.this,LoginActiivity.class));
 
-            }
-        });
 
         binding.cardFindDcotor.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -95,6 +88,15 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(HomeActivity.this,HealthArticleActivity.class));
+            }
+        });
+
+        binding.cardLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FirebaseAuth.getInstance().signOut();
+                startActivity(new Intent(HomeActivity.this,LoginActiivity.class));
+
             }
         });
     }

@@ -5,14 +5,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.SimpleAdapter;
-import android.widget.Toast;
 
 import com.example.healthcare.databinding.ActivityLabTestBinding;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -26,13 +23,11 @@ public class LabTestActivity extends AppCompatActivity {
     ActivityLabTestBinding binding;
     private String labName;
     private String hospitalAddress ;
-    private String labCost;
     private String labTestTime ;
-    private FirebaseAuth mAuth;
     private DocumentReference docRef;
     private FirebaseFirestore db;
     private  int documentCount;
-    private List<List<String>>lab_details;
+    private List<List<String>> lab_details;
     ArrayList  list;
     SimpleAdapter sa;
 
@@ -43,7 +38,6 @@ public class LabTestActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         db = FirebaseFirestore.getInstance();
-        mAuth = FirebaseAuth.getInstance();
         lab_details = new ArrayList<List<String>>();
 
         //number of document under collection of firestore
@@ -51,8 +45,8 @@ public class LabTestActivity extends AppCompatActivity {
         usersCollectionRef.get().addOnSuccessListener(querySnapshot -> {
             documentCount = querySnapshot.size();
 
-            for(int i=0;i<documentCount;i++){
-                final int index = i; // create a final variable to hold the current value of i
+            for(int i=0;i<documentCount;i++){   //0
+                final int index = i; //
                 docRef = db.collection("Lab Tests").document("labTest"+(i+1));
                 docRef.get().addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()){
@@ -65,11 +59,11 @@ public class LabTestActivity extends AppCompatActivity {
                             items.put("line2", "Hospital Address : "+lab_details.get(j).get(1));
                             items.put("line3", "Cost : "+lab_details.get(j).get(2) +" TK");
                             items.put("line4", "Time : "+lab_details.get(j).get(3));
-                            list.add(items);
+                            list.add(items); //[ {line1: cLab test nsme: ddd, } ]
                         }
 
                         sa = new SimpleAdapter(this, list, R.layout.lab_test_list,
-                                new String[]{"line1", "line2", "line3", "line4", "line5","line6"},
+                                new String[]{"line1", "line2", "line3", "line4"},
                                 new int[]{R.id.labTestName, R.id.hospitalAddress, R.id.cost, R.id.time});
 
                         binding.labTestList.setAdapter(sa);
